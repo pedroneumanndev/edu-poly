@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curso Polymarket — Do Zero ao Trade</title>
+<style>
+  :root{
+    --bg:#0b0f1a; --panel:#141b2d; --panel2:#1b2340; --border:#2a3353;
+    --text:#e8ecf5; --muted:#8a95b2; --accent:#7c5cff; --accent2:#22d3ee;
+    --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
+    --mono:'JetBrains Mono','SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:linear-gradient(180deg,#0b0f1a 0%,#0d1322 100%);
+    color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    line-height:1.65;min-height:100vh;
+  }
+
+  /* Layout */
+  .container{max-width:880px;margin:0 auto;padding:0 24px}
+
+  /* Hero */
+  header.hero{
+    padding:80px 24px 60px;text-align:center;
+    background:radial-gradient(ellipse at top,rgba(124,92,255,0.15),transparent 60%);
+    border-bottom:1px solid var(--border);
+  }
+  header.hero .badge{
+    display:inline-block;padding:6px 14px;border-radius:999px;
+    background:rgba(124,92,255,0.12);border:1px solid rgba(124,92,255,0.3);
+    color:var(--accent);font-size:12px;font-weight:600;letter-spacing:0.08em;
+    text-transform:uppercase;margin-bottom:20px;
+  }
+  header.hero h1{font-size:48px;font-weight:800;letter-spacing:-0.02em;line-height:1.15;margin-bottom:16px}
+  header.hero h1 .grad{
+    background:linear-gradient(90deg,var(--accent) 0%,var(--accent2) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  header.hero p.subtitle{font-size:18px;color:var(--muted);max-width:600px;margin:0 auto 32px}
+  header.hero .cta{
+    display:inline-block;padding:14px 28px;background:var(--accent);color:#fff;
+    border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;
+    transition:transform 0.2s,box-shadow 0.2s;
+  }
+  header.hero .cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,92,255,0.4)}
+
+  /* Nav (Table of Contents) */
+  nav.toc{
+    position:sticky;top:0;background:rgba(11,15,26,0.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);z-index:10;padding:14px 0;
+  }
+  nav.toc .container{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  nav.toc .container::-webkit-scrollbar{display:none}
+  nav.toc a{
+    flex-shrink:0;padding:8px 14px;color:var(--muted);text-decoration:none;
+    font-size:13px;font-weight:500;border-radius:6px;white-space:nowrap;
+    transition:background 0.15s,color 0.15s;
+  }
+  nav.toc a:hover{background:var(--panel);color:var(--text)}
+
+  /* Sections */
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--border)}
+  section.lesson:last-child{border-bottom:none}
+  section.lesson .lesson-num{
+    display:inline-block;font-family:var(--mono);font-size:12px;font-weight:700;
+    color:var(--accent);letter-spacing:0.1em;margin-bottom:12px;
+  }
+  section.lesson h2{font-size:32px;font-weight:700;letter-spacing:-0.01em;margin-bottom:20px}
+  section.lesson h3{font-size:20px;font-weight:600;margin:28px 0 12px}
+  section.lesson p{margin-bottom:16px;color:#d6dcec}
+  section.lesson ul,section.lesson ol{margin:12px 0 20px 24px;color:#d6dcec}
+  section.lesson li{margin-bottom:8px}
+  section.lesson code{
+    font-family:var(--mono);font-size:13px;padding:2px 7px;
+    background:var(--panel2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);
+  }
+  section.lesson strong{color:var(--text);font-weight:700}
+  section.lesson a{color:var(--accent2);text-decoration:none;border-bottom:1px dashed rgba(34,211,238,0.4)}
+  section.lesson a:hover{border-bottom-style:solid}
+
+  /* Cards */
+  .card{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:22px;margin:20px 0;
+  }
+  .card.accent{border-left:3px solid var(--accent)}
+  .card.warn{border-left:3px solid var(--yellow);background:rgba(245,158,11,0.05)}
+  .card.green{border-left:3px solid var(--green);background:rgba(16,185,129,0.05)}
+
+  /* Price/Prob calculator */
+  .calc{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:28px;margin:24px 0;
+  }
+  .calc-label{font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px;font-weight:600}
+  .calc-slider{width:100%;height:8px;border-radius:4px;appearance:none;background:var(--border);outline:none;cursor:pointer}
+  .calc-slider::-webkit-slider-thumb{
+    appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--accent);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 2px var(--accent);
+  }
+  .calc-display{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:24px;
+  }
+  .calc-cell{
+    background:var(--panel2);border-radius:8px;padding:16px;text-align:center;
+    border:1px solid var(--border);
+  }
+  .calc-cell .v{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--accent2)}
+  .calc-cell .l{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+  table th,table td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--border)}
+  table th{background:var(--panel2);font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:0.05em}
+  table tr:hover td{background:rgba(124,92,255,0.03)}
+  .num{font-family:var(--mono);text-align:right}
+  .pos{color:var(--green)}.neg{color:var(--red)}
+
+  /* Quiz */
+  .quiz-q{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:22px;margin:16px 0;
+  }
+  .quiz-q h4{font-size:16px;margin-bottom:14px;font-weight:600}
+  .quiz-q .opts{display:flex;flex-direction:column;gap:8px}
+  .quiz-q .opt{
+    padding:12px 16px;background:var(--panel2);border:1px solid var(--border);
+    border-radius:8px;cursor:pointer;transition:all 0.15s;font-size:14px;
+  }
+  .quiz-q .opt:hover{border-color:var(--accent);background:rgba(124,92,255,0.08)}
+  .quiz-q .opt.correct{background:rgba(16,185,129,0.12);border-color:var(--green);color:var(--green)}
+  .quiz-q .opt.wrong{background:rgba(239,68,68,0.12);border-color:var(--red);color:var(--red)}
+  .quiz-q .explain{
+    margin-top:12px;padding:12px 14px;background:var(--panel2);border-radius:8px;
+    font-size:13px;color:var(--muted);display:none;border-left:3px solid var(--accent);
+  }
+  .quiz-q .explain.show{display:block}
+  .quiz-score{
+    text-align:center;padding:28px;background:var(--panel);border:1px solid var(--border);
+    border-radius:12px;margin-top:24px;
+  }
+  .quiz-score .s{font-family:var(--mono);font-size:42px;font-weight:700;color:var(--accent2)}
+  .quiz-score .l{color:var(--muted);margin-top:4px}
+
+  /* Footer */
+  footer{padding:40px 0;text-align:center;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
+  footer a{color:var(--accent2);text-decoration:none}
+
+  /* Responsive */
+  @media(max-width:640px){
+    header.hero h1{font-size:34px}
+    header.hero p.subtitle{font-size:16px}
+    section.lesson h2{font-size:26px}
+    .calc-display{grid-template-columns:1fr}
+    .container{padding:0 16px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="badge">Curso gratuito</div>
+  <h1>Polymarket <span class="grad">do zero ao trade</span></h1>
+  <p class="subtitle">
+    Aprenda como mercados preditivos funcionam, como ler preços como probabilidades,
+    e como começar a operar com segurança. 9 lições + quiz no final.
+  </p>
+  <a href="#l1" class="cta">Começar agora →</a>
+</header>
+
+<nav class="toc">
+  <div class="container">
+    <a href="#l1">1. O que é</a>
+    <a href="#l2">2. Como funciona</a>
+    <a href="#l3">3. Preço = probabilidade</a>
+    <a href="#l4">4. Tipos de mercado</a>
+    <a href="#l5">5. Order Book</a>
+    <a href="#l6">6. Estratégias</a>
+    <a href="#l7">7. Riscos</a>
+    <a href="#l8">8. Como começar</a>
+    <a href="#quiz">9. Quiz</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- LESSON 1 -->
+  <section class="lesson" id="l1">
+    <span class="lesson-num">Lição 01</span>
+    <h2>O que é Polymarket?</h2>
+    <p>
+      <strong>Polymarket</strong> é o maior mercado preditivo descentralizado do mundo. Em vez de apostar contra uma casa,
+      você compra ações (shares) que valem <strong>$1 se um evento acontecer</strong> e <strong>$0 se não acontecer</strong>.
+      O preço entre $0 e $1 reflete a probabilidade que o mercado atribui ao evento.
+    </p>
+    <div class="card accent">
+      <p style="margin:0">
+        <strong>Exemplo:</strong> "Trump será eleito em 2024?" — se o YES custa $0.62, o mercado acha 62% de chance.
+        Se Trump ganhar, quem comprou YES recebe $1 por share. Quem comprou NO recebe $0.
+      </p>
+    </div>
+    <p>
+      É construído sobre a blockchain Polygon, usa <strong>USDC</strong> (stablecoin atrelada ao dólar) como colateral,
+      e a liquidação acontece automaticamente via smart contract quando o evento resolve.
+    </p>
+    <h3>Por que existe?</h3>
+    <ul>
+      <li><strong>Agregar informação:</strong> preços de mercado costumam prever melhor que pesquisas e analistas.</li>
+      <li><strong>Hedge:</strong> você pode se proteger contra eventos indesejados (ex: uma empresa vendendo contra recessão).</li>
+      <li><strong>Especulação:</strong> traders tentam achar mispricings e lucrar com a correção.</li>
+    </ul>
+  </section>
+
+  <!-- LESSON 2 -->
+  <section class="lesson" id="l2">
+    <span class="lesson-num">Lição 02</span>
+    <h2>Como funciona na prática</h2>
+    <p>
+      Cada mercado binário tem <strong>dois tokens</strong>: YES e NO. A soma dos preços deles sempre é próxima de $1
+      (em equilíbrio). Você escolhe comprar um ou outro.
+    </p>
+    <table>
+      <tr><th>Ação</th><th>Você compra</th><th>Paga</th><th>Ganha se</th><th>Perde se</th></tr>
+      <tr><td>Long YES</td><td>Token YES</td><td class="num">$0.62</td><td>evento acontece</td><td>não acontece</td></tr>
+      <tr><td>Long NO</td><td>Token NO</td><td class="num">$0.38</td><td>evento NÃO acontece</td><td>acontece</td></tr>
+    </table>
+    <h3>Payout</h3>
+    <p>
+      Se o evento resolve <strong>SIM</strong>, cada YES vira $1 e cada NO vira $0. E vice-versa. Seu lucro/prejuízo é:
+    </p>
+    <div class="card accent">
+      <code style="font-size:14px;display:block;padding:12px">PnL = (payout_final − preço_de_entrada) × quantidade_de_tokens</code>
+      <p style="margin-top:12px">
+        Exemplo: comprou 100 YES a $0.62 → gastou $62. Evento acontece → recebe $100 → lucro $38 (+61%).
+        Evento não acontece → perde $62 (−100%).
+      </p>
+    </div>
+    <p>
+      <strong>Importante:</strong> você também pode <strong>vender antes</strong> do evento resolver, pelo preço atual.
+      Se comprou YES a $0.40 e o preço subiu pra $0.70, dá pra realizar os $0.30 de lucro sem esperar.
+    </p>
+  </section>
+
+  <!-- LESSON 3 -->
+  <section class="lesson" id="l3">
+    <span class="lesson-num">Lição 03</span>
+    <h2>Preço = probabilidade implícita</h2>
+    <p>
+      Esta é a intuição mais importante de todas: <strong>o preço de um token YES é a probabilidade que o mercado atribui
+      ao evento acontecer</strong>. Se YES custa $0.30, o mercado diz "tem 30% de chance".
+    </p>
+    <p>Use o slider abaixo pra ver como preço, probabilidade e retorno se relacionam:</p>
+
+    <div class="calc">
+      <div class="calc-label">Preço do YES</div>
+      <input type="range" id="priceSlider" class="calc-slider" min="1" max="99" value="30">
+      <div class="calc-display">
+        <div class="calc-cell">
+          <div class="v" id="priceOut">$0.30</div>
+          <div class="l">Preço YES</div>
+        </div>
+        <div class="calc-cell">
+          <div class="v" id="probOut">30%</div>
+          <div class="l">Prob. implícita</div>
+        </div>
+        <div class="calc-cell">
+          <div class="v pos" id="roiOut">+233%</div>
+          <div class="l">ROI se acertar</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Arbitragem mental rápida</h3>
+    <p>
+      Quando você olha um mercado, converta sempre o preço em probabilidade. Aí pergunta:
+      <strong>você acha que a chance real é maior ou menor que essa?</strong>
+    </p>
+    <ul>
+      <li>Se você acha <strong>maior</strong> → compra YES (o mercado tá subestimando)</li>
+      <li>Se você acha <strong>menor</strong> → compra NO (o mercado tá superestimando)</li>
+      <li>Se você acha <strong>igual</strong> → não opera (não tem edge)</li>
+    </ul>
+    <div class="card warn">
+      <p style="margin:0">
+        <strong>Armadilha comum:</strong> achar que "gostar" do candidato = comprar YES. Não. Você tá comparando
+        a sua <em>estimativa numérica</em> com o preço, não torcendo. Torcedor perde dinheiro.
+      </p>
+    </div>
+  </section>
+
+  <!-- LESSON 4 -->
+  <section class="lesson" id="l4">
+    <span class="lesson-num">Lição 04</span>
+    <h2>Tipos de mercado</h2>
+    <h3>Binário (SIM/NÃO)</h3>
+    <p>O padrão. Duas resoluções possíveis. Exemplo: "Haverá recessão em 2025?"</p>
+
+    <h3>Multi-outcome (multi-resolução)</h3>
+    <p>
+      Vários candidatos, só um ganha. Cada candidato tem seu token YES. A soma dos preços tende a 1.0.
+      Exemplo: "Quem será o presidente dos EUA em 2028?" com tokens separados pra Newsom, Rubio, Vance, JD, etc.
+    </p>
+    <div class="card accent">
+      <p style="margin:0">
+        <strong>Gotcha:</strong> em multi-outcome, o "NO" de um candidato é o "YES" agregado de todos os outros.
+        Shortar o favorito é comprar os outros proporcionalmente — operação chamada <em>basket sell</em>.
+      </p>
+    </div>
+
+    <h3>Scalar / Daily ladder</h3>
+    <p>
+      Tipo ladder de preço: "BTC vai fechar acima de $70k em 31/10?". Comum em mercados cripto diários com strikes
+      a cada $500-$1000. Resolução por oráculo (Chainlink) usando preço de fechamento.
+    </p>
+
+    <h3>Conditional (condicional)</h3>
+    <p>
+      Mais raro. "Se Trump ganhar, haverá tarifas de 20%+?" — só resolve se a condição antecedente acontecer,
+      senão devolve o dinheiro.
+    </p>
+  </section>
+
+  <!-- LESSON 5 -->
+  <section class="lesson" id="l5">
+    <span class="lesson-num">Lição 05</span>
+    <h2>Order Book e liquidez</h2>
+    <p>
+      Polymarket usa um <strong>Central Limit Order Book (CLOB)</strong> — ou seja, tem book com ordens de compra e venda.
+      Você pode colocar <strong>limit</strong> (preço específico, espera preencher) ou <strong>market</strong> (preenche já
+      pelo que tiver disponível).
+    </p>
+
+    <h3>Anatomia do book</h3>
+    <table>
+      <tr><th>Lado</th><th>Tipo</th><th>Preço</th><th>Tamanho</th></tr>
+      <tr><td>Bids (compra)</td><td class="pos">Buy</td><td class="num">0.61</td><td class="num">1200</td></tr>
+      <tr><td>Bids (compra)</td><td class="pos">Buy</td><td class="num">0.60</td><td class="num">3400</td></tr>
+      <tr><td>—</td><td>Spread = $0.02</td><td>—</td><td>—</td></tr>
+      <tr><td>Asks (venda)</td><td class="neg">Sell</td><td class="num">0.63</td><td class="num">900</td></tr>
+      <tr><td>Asks (venda)</td><td class="neg">Sell</td><td class="num">0.64</td><td class="num">2100</td></tr>
+    </table>
+    <p>
+      O <strong>spread</strong> (diferença entre melhor bid e melhor ask) é o custo implícito de entrar + sair.
+      Mercados ilíquidos têm spread alto (5-10¢), mercados líquidos têm 1-2¢.
+    </p>
+
+    <h3>Taxas</h3>
+    <ul>
+      <li><strong>Maker</strong> (você coloca ordem no book e espera): costuma ser <strong>zero</strong></li>
+      <li><strong>Taker</strong> (você bate na ordem de alguém): ~2% do valor</li>
+      <li><strong>Gas da blockchain</strong>: pago pelo exchange (você não paga gas)</li>
+    </ul>
+    <div class="card warn">
+      <p style="margin:0">
+        Se entrar e sair como taker, paga ~2% duas vezes = <strong>4% round-trip</strong>. Isso corrói retorno em
+        operações curtas. Prefira ordens limit em mercados com liquidez.
+      </p>
+    </div>
+  </section>
+
+  <!-- LESSON 6 -->
+  <section class="lesson" id="l6">
+    <span class="lesson-num">Lição 06</span>
+    <h2>Estratégias básicas</h2>
+
+    <h3>1. Value / Mispricing</h3>
+    <p>
+      A mais óbvia: você acha que o preço está errado. Compra o lado subavaliado. Funciona quando você tem
+      <strong>informação ou modelagem melhor</strong> que o mercado agregado.
+    </p>
+
+    <h3>2. Event-driven</h3>
+    <p>
+      Entrar antes de um catalisador (debate, decisão de corte de juros, evento geopolítico) quando você acredita
+      que o preço vai reagir de um jeito específico. Exige leitura rápida e disciplina pra sair.
+    </p>
+
+    <h3>3. Mean reversion (fade de extremos)</h3>
+    <p>
+      Comprar NO quando YES passou de 0.85 baseado em hype. Cuidado: em Polymarket,
+      <strong>extremos acima de 0.90 muitas vezes estão certos</strong> — não é mercado financeiro comum.
+      Funciona melhor em evento de resolução longa com ruído emocional.
+    </p>
+
+    <h3>4. Copy trading</h3>
+    <p>
+      Seguir wallets que historicamente performam bem. Vantagem: terceiriza a decisão pra quem já provou skill.
+      Desvantagem: você entra depois, paga preço pior, e não sabe o raciocínio.
+    </p>
+
+    <h3>5. Arbitragem entre mercados correlatos</h3>
+    <p>
+      "Fed corta juros em novembro?" e "Fed corta juros em dezembro?" — se não forem consistentes entre si,
+      dá pra hedgeear e capturar o spread. Nível avançado.
+    </p>
+
+    <div class="card green">
+      <p style="margin:0">
+        <strong>Regra de ouro:</strong> toda estratégia tem que superar <strong>4% de custo round-trip (taxa)</strong>
+        + custo de capital parado. Se seu edge é 3%, você vai perder dinheiro mesmo acertando a direção.
+      </p>
+    </div>
+  </section>
+
+  <!-- LESSON 7 -->
+  <section class="lesson" id="l7">
+    <span class="lesson-num">Lição 07</span>
+    <h2>Riscos que ninguém fala</h2>
+
+    <h3>Risco de resolução</h3>
+    <p>
+      Alguns mercados têm redação ambígua. Exemplo clássico: "Putin deixará o poder em 2024?" — o que conta
+      como "deixar"? Morte? Renúncia? Golpe? A comunidade (via UMA Protocol) decide, e nem sempre bate com
+      a expectativa do trader. Leia <strong>as rules do mercado</strong> antes de entrar.
+    </p>
+
+    <h3>Risco de liquidez</h3>
+    <p>
+      Você pode entrar num mercado em 500k de volume e na hora de sair ter só 2k de liquidez.
+      Resultado: ou fica preso até a resolução, ou vende com desconto grande.
+    </p>
+
+    <h3>Risco de tempo (capital parado)</h3>
+    <p>
+      Comprar YES a $0.15 parece barato, mas se o evento resolve só daqui a 2 anos, você tá com $0.15 travado
+      sem render. O custo de oportunidade é real.
+    </p>
+
+    <h3>Risco emocional</h3>
+    <p>
+      Mercados preditivos são <strong>binários</strong> — ou ganha tudo ou perde tudo. Isso mexe com o emocional
+      mais do que bolsa. Sizing pequeno e disciplina salvam a banca.
+    </p>
+
+    <div class="card warn">
+      <p style="margin:0">
+        <strong>Kelly fracional:</strong> nunca coloque mais de ~2-5% da sua banca num único mercado.
+        Mesmo com 70% de edge, uma sequência ruim derruba tudo se a posição for muito grande.
+      </p>
+    </div>
+  </section>
+
+  <!-- LESSON 8 -->
+  <section class="lesson" id="l8">
+    <span class="lesson-num">Lição 08</span>
+    <h2>Como começar — passo a passo</h2>
+    <ol>
+      <li>
+        <strong>Criar conta:</strong> acesse <a href="https://polymarket.com" target="_blank">polymarket.com</a>.
+        Login via email ou wallet (MetaMask, Phantom).
+      </li>
+      <li>
+        <strong>Depositar USDC:</strong> a plataforma aceita depósito via ponte automática (Polygon bridge).
+        Mínimo prático: $50-100 pra ter sizing útil.
+      </li>
+      <li>
+        <strong>Explorar mercados:</strong> comece em mercados de <em>volume alto</em> (top 20 por volume).
+        Spread menor, liquidez pra sair, resolução geralmente confiável.
+      </li>
+      <li>
+        <strong>Primeira posição:</strong> paper trade mental primeiro — escolha 3 mercados, anote sua estimativa
+        vs preço, acompanhe 1 semana. Só entre com dinheiro depois de calibrar a intuição.
+      </li>
+      <li>
+        <strong>Registrar cada trade:</strong> planilha com entry, size, tese, exit, PnL. Revisão mensal mostra
+        onde você tem edge e onde perde dinheiro.
+      </li>
+    </ol>
+    <div class="card green">
+      <p style="margin:0">
+        <strong>Comece pequeno:</strong> primeiros 3 meses, size máximo por trade = $5-20. O objetivo é
+        aprender, não ganhar. Quem pula essa etapa queima banca.
+      </p>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="lesson" id="quiz">
+    <span class="lesson-num">Lição 09</span>
+    <h2>Quiz final — teste seu entendimento</h2>
+    <p>5 perguntas. Clique na alternativa correta. Você vê o resultado ao responder todas.</p>
+
+    <div id="quizContainer"></div>
+
+    <div class="quiz-score" id="quizScore" style="display:none">
+      <div class="s"><span id="scoreValue">0</span>/5</div>
+      <div class="l" id="scoreMsg">Resultado</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <p>Curso construído pra aprendizado prático. Não é aconselhamento financeiro.</p>
+    <p style="margin-top:8px">
+      Quer aprofundar? <a href="https://docs.polymarket.com" target="_blank">docs.polymarket.com</a> ·
+      <a href="https://polymarket.com" target="_blank">polymarket.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  // Price ↔ Probability calculator
+  const slider = document.getElementById('priceSlider');
+  const priceOut = document.getElementById('priceOut');
+  const probOut = document.getElementById('probOut');
+  const roiOut = document.getElementById('roiOut');
+
+  function updateCalc(){
+    const v = parseInt(slider.value, 10);
+    const price = v / 100;
+    const prob = v;
+    const roi = price > 0 ? Math.round((1 / price - 1) * 100) : 0;
+    priceOut.textContent = '$' + price.toFixed(2);
+    probOut.textContent = prob + '%';
+    roiOut.textContent = (roi >= 0 ? '+' : '') + roi + '%';
+    roiOut.className = 'v ' + (roi > 0 ? 'pos' : 'neg');
+  }
+  slider.addEventListener('input', updateCalc);
+  updateCalc();
+
+  // Quiz
+  const quiz = [
+    {
+      q: 'Um token YES custa $0.40. Qual a probabilidade implícita e o retorno se acertar?',
+      opts: [
+        '40% / +60% de retorno',
+        '60% / +40% de retorno',
+        '40% / +150% de retorno',
+        '60% / +150% de retorno',
+      ],
+      correct: 2,
+      explain: 'Preço $0.40 = 40% de probabilidade. Retorno se acertar: (1/0.40 − 1) = 1.5 = +150%.',
+    },
+    {
+      q: 'Você acha que "X acontece" tem 30% de chance. Token YES de X custa $0.50. O que fazer?',
+      opts: [
+        'Comprar YES — ainda pode subir',
+        'Comprar NO — mercado tá superestimando',
+        'Não operar — sem edge suficiente',
+        'Comprar YES e NO pra fazer hedge',
+      ],
+      correct: 1,
+      explain: 'Sua estimativa (30%) < preço do YES (50%). Mercado superestima → NO tá subvalorizado (custa $0.50, deveria custar $0.70). Compra NO.',
+    },
+    {
+      q: 'Qual é o custo round-trip típico de uma operação que entra e sai como taker?',
+      opts: [
+        '~0.5%',
+        '~2%',
+        '~4%',
+        '~8%',
+      ],
+      correct: 2,
+      explain: '2% de taxa na entrada + 2% na saída ≈ 4% round-trip. Toda estratégia precisa de edge > 4% pra ser viável.',
+    },
+    {
+      q: 'Você comprou 200 tokens YES de "Time A ganha Copa" a $0.35. Time A ganhou. Quanto você recebe?',
+      opts: [
+        '$70 (200 × 0.35)',
+        '$200 (payout × tokens)',
+        '$130 (lucro líquido)',
+        '$100 (1 USDC por share × 100)',
+      ],
+      correct: 1,
+      explain: 'Cada YES vira $1 na resolução. 200 tokens × $1 = $200 recebidos. Custo foi $70, então lucro líquido = $130 (+185%).',
+    },
+    {
+      q: 'Qual dos abaixo é um risco REAL em Polymarket que muito iniciante ignora?',
+      opts: [
+        'A bolsa pode falir e levar seu dinheiro',
+        'Resolução ambígua quando as rules não são claras',
+        'Você é obrigado a manter posição até o evento resolver',
+        'Só dá pra sacar em BTC',
+      ],
+      correct: 1,
+      explain: 'Risco de resolução é real — rules mal redigidas ou eventos ambíguos geram disputas. A UMA Protocol decide, e nem sempre do jeito esperado. Leia as rules antes de entrar.',
+    },
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+  let answered = 0;
+  let correct = 0;
+
+  quiz.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    div.innerHTML = `
+      <h4>${i + 1}. ${item.q}</h4>
+      <div class="opts">
+        ${item.opts.map((o, j) => `<div class="opt" data-idx="${j}">${String.fromCharCode(65 + j)}) ${o}</div>`).join('')}
+      </div>
+      <div class="explain"><strong>Explicação:</strong> ${item.explain}</div>
+    `;
+    quizContainer.appendChild(div);
+
+    const opts = div.querySelectorAll('.opt');
+    const explain = div.querySelector('.explain');
+    let locked = false;
+
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (locked) return;
+        locked = true;
+        const idx = parseInt(opt.dataset.idx, 10);
+        if (idx === item.correct) {
+          opt.classList.add('correct');
+          correct++;
+        } else {
+          opt.classList.add('wrong');
+          opts[item.correct].classList.add('correct');
+        }
+        explain.classList.add('show');
+        answered++;
+        if (answered === quiz.length) showScore();
+      });
+    });
+  });
+
+  function showScore(){
+    const box = document.getElementById('quizScore');
+    document.getElementById('scoreValue').textContent = correct;
+    let msg = '';
+    if (correct === 5) msg = '🎯 Perfeito. Você tá pronto pra começar.';
+    else if (correct >= 3) msg = '👍 Bom. Revisa as lições das que errou.';
+    else msg = '📚 Volta e relê com calma — é matéria nova, é normal.';
+    document.getElementById('scoreMsg').textContent = msg;
+    box.style.display = 'block';
+    box.scrollIntoView({behavior: 'smooth', block: 'center'});
+  }
+</script>
+
+</body>
+</html>
